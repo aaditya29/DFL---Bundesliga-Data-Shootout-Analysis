@@ -1,9 +1,12 @@
 from ultralytics import YOLO
+import supervision as sv
 
 
 class Tracker:
     def __init__(self, model_path):
         self.model = YOLO(model_path)
+        # each detected object is assigned a unique tracker ID, enabling the continuous following of the object's motion path across different frames
+        self.tracker = sv.ByteTrack()
 
     # method to detect the frames from the videos with self as reference and frames as list or array of image frames
     def detect_frames(self, frames):
@@ -28,3 +31,14 @@ class Tracker:
 
     def get_object_tracks(self, frames):
         detections = self.detect_frames(frames)
+
+        # overwriting goalkeeper with the player due to error in detection
+        for frame_num, detection in enumerate(detections):
+            # mapping class and names{0:person, 1: goal,.. etc}
+            cls_names = detection.names
+
+            # k is key and v is value
+            cls_names_inv = {v: k for k, v in cls_names.items()}
+
+            # Converting to supervision detection format
+            detection_supervision = sv.Detections.from_ultralytics(detection)
