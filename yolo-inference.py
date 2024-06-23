@@ -1,7 +1,7 @@
 from ultralytics import YOLO
 
 # writing model name
-model = YOLO('yolov8s')
+model = YOLO('models/best.pt')
 results = model.predict('input-videos/08fd33_4.mp4',
                         save=True)  # saving the result
 
