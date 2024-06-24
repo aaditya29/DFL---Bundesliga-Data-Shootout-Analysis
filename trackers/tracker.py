@@ -34,6 +34,14 @@ class Tracker:
     def get_object_tracks(self, frames):
         detections = self.detect_frames(frames)
 
+        # putting the tracked object in a format so we can utilise easily
+        # here we are using dictionary with the lists
+        tracks = {
+            "players": [],
+            "referees": [],
+            "ball": []
+        }
+
         # overwriting goalkeeper with the player due to error in detection
         for frame_num, detection in enumerate(detections):
             # mapping class and names{0:person, 1: goal,.. etc}
@@ -55,8 +63,66 @@ class Tracker:
                     detection_supervision.class_id[object_ind] = cls_names_inv["player"]
 
             # Tracking Objects
+
+            """
+            Following code is crucial in maintaining continuity of object identities across video frames, which is essential for tasks like counting unique objects or analyzing their trajectories over time.
+            
+            detection_with_tracks variable contains the updated tracking information, including both the current detections and their associated track IDs.
+            
+            self.tracker is an object responsible for tracking detected objects across multiple frames of video.
+            
+            detection_supervision is the input to the method.
+            
+            update_with_detections() is a method of the tracker object. Its purpose is to update the current tracks (ongoing object trajectories) with new detection information.
+            """
             detection_with_tracks = self.tracker.update_with_detections(
                 detection_supervision)
+
+            # for each frame we are going to have tracks of players, referees and balls
+            # then we append a dict and and this is going to have key with track id and value is going to be bounding box
+            # Each list item represents a frame, and we're adding an empty dictionary for the current frame.
+            # This structure allows for frame-by-frame tracking of multiple objects.
+            tracks["players"].append({})
+            tracks["referees"].append({})
+            tracks["ball"].append({})
+
+            # going to loop over each detection with tracks
+            """
+            frame_detection[0] is the bounding box, converted to a list (it was likely a numpy array).
+            frame_detection[3] is the class ID (e.g., player, referee).
+            frame_detection[4] is the track ID, which is unique for each tracked object.
+            """
+            for frame_detection in detection_with_tracks:
+                # 0 is the key of bounding box
+                bbox = frame_detection[0].tolist()
+                cls_id = frame_detection[3]  # 3 is the key of class id
+                track_id = frame_detection[4]  # 4 is the key of track id
+
+                """
+                This part organizes the tracked objects by type and track ID.
+                
+                cls_names_inv is a dictionary mapping class names to IDs.
+                For each player and referee, we're storing their bounding box in the current frame (frame_num), indexed by their track_id.
+                """
+                if cls_id == cls_names_inv['player']:
+                    tracks["players"][frame_num][track_id] = {"bbox": bbox}
+
+                if cls_id == cls_names_inv['referee']:
+                    tracks["referees"][frame_num][track_id] = {"bbox": bbox}
+
+            # Processing ball detection
+
+            """
+            Here we use the original detection_supervision because there is only one ball and we don't need complex tracking like players or referees.
+            
+            The ball's bounding box is always stored with key 1, suggesting we're not tracking multiple balls or maintaining a consistent track ID for the ball across frames.
+            """
+            for frame_detection in detection_supervision:
+                bbox = frame_detection[0].tolist()
+                cls_id = frame_detection[3]
+
+                if cls_id == cls_names_inv['ball']:
+                    tracks["ball"][frame_num][1] = {"bbox": bbox}
 
             print(detection_supervision)
 
