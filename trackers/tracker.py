@@ -1,7 +1,11 @@
+from utils import get_center_of_bbox, get_bbox_width, get_foot_position
 from ultralytics import YOLO
 import supervision as sv
 import pickle
 import os
+import sys
+import cv2
+sys.path.append('../')
 
 
 class Tracker:
@@ -147,8 +151,48 @@ class Tracker:
         return tracks
 
 
+"""
+Following method defines a method called draw_ellipse that takes several parameters:
+
+self: Indicates method in a class
+frame: video frame
+bbox: bounding box, ontaining coordinates
+color: color to draw the ellipse
+track_id: An optional parameter, defaulting to None
+"""
+
+
 def draw_ellipses(self, frame, bbox, color, track_id=None):
+
+    # y2 is set to the integer value of the fourth element in bbox
     y2 = int(bbox[3])
+    x_center, _ = get_center_of_bbox(bbox)
+    width = get_bbox_width(bbox)
+
+    """
+    Here we calling OpenCV's ellipse function to draw an ellipse on the frame.
+    
+    The center is at (x_center, y2)
+    The axes are (width, 0.35*width), making it wider than it is tall
+    The ellipse is not rotated (angle=0.0)
+    It's drawn from -45 degrees to 235 degrees, creating a partial ellipse
+    It uses the provided color
+    The line thickness is 2 pixels
+    The line type is cv2.LINE_4 i.e. (4-connected line)
+    """
+    cv2.ellipse(
+        frame,
+        center=(x_center, y2),
+        axes=(int(width), int(0.35*width)),
+        angle=0.0,
+        startAngle=-45,
+        endAngle=235,
+        color=color,
+        thickness=2,
+        lineType=cv2.LINE_4
+    )
+
+    return frame
 
 
 # Adding Circles Near Bounding Boxes
@@ -188,5 +232,5 @@ def draw_annotations(self, video_frames, tracks, team_ball_control):
         If the player has the ball (player.get('has_ball', False)), calls self.draw_traingle to draw a triangle on the player's bounding box.
         """
         for track_id, player in player_dict.items():
-            color = player.get("team_color", (0, 0, 255))
-            frame = self.draw_ellipse(frame, player["bbox"], color, track_id)
+            frame = self.draw_ellipse(
+                frame, player["bbox"], (0, 0, 255), track_id)
