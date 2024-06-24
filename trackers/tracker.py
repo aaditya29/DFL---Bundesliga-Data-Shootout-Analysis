@@ -41,8 +41,11 @@ class Tracker:
 
             # k is key and v is value
             cls_names_inv = {v: k for k, v in cls_names.items()}
+            print(cls_names)
 
             # Converting to supervision detection format
             detection_supervision = sv.Detections.from_ultralytics(detection)
 
             print(detection_supervision)
+
+            break
