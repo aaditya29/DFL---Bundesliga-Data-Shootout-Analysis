@@ -27,6 +27,8 @@ class Tracker:
                 frames[i:i+batch_size], conf=0.1)
             # adding the etections from the current batch to the overall detections list.
             detections += detections_batch
+            break  # to not run on all the frames
+
         return detections  # returning the detections
 
     def get_object_tracks(self, frames):
@@ -42,3 +44,5 @@ class Tracker:
 
             # Converting to supervision detection format
             detection_supervision = sv.Detections.from_ultralytics(detection)
+
+            print(detection_supervision)
