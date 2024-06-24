@@ -147,6 +147,10 @@ class Tracker:
         return tracks
 
 
+def draw_ellipses(self, frame, bbox, color, track_id=None):
+    y2 = int(bbox[3])
+
+
 # Adding Circles Near Bounding Boxes
 """
 self: refers to the instance of the class this method belongs to.
