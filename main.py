@@ -16,8 +16,11 @@ def main():
                                        read_from_stub=True,
                                        stub_path='stubs/track_stubs.pkl')
 
+    # Calling draw output function for object tracks
+    output_video_frames = tracker.draw_annotations(video_frames, tracks)
+
     # Saving video
-    save_video(video_frames, 'output_videos/output_video.avi')
+    save_video(output_video_frames, 'output_videos/output_video.avi')
 
 
 if __name__ == "__main__":
