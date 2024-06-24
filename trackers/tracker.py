@@ -54,6 +54,10 @@ class Tracker:
                 if cls_names[class_id] == "goalkeeper":
                     detection_supervision.class_id[object_ind] = cls_names_inv["player"]
 
+            # Tracking Objects
+            detection_with_tracks = self.tracker.update_with_detections(
+                detection_supervision)
+
             print(detection_supervision)
 
             break
