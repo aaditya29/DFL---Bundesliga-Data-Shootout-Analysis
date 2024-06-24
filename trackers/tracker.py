@@ -1,5 +1,7 @@
 from ultralytics import YOLO
 import supervision as sv
+import pickle
+import os
 
 
 class Tracker:
@@ -27,11 +29,25 @@ class Tracker:
                 frames[i:i+batch_size], conf=0.1)
             # adding the etections from the current batch to the overall detections list.
             detections += detections_batch
-            break  # to not run on all the frames
 
         return detections  # returning the detections
 
-    def get_object_tracks(self, frames):
+    def get_object_tracks(self, frames, read_from_stub=False, stub_path=None):
+        """
+        Here we are checking if:
+        read_from_stub is True AND
+        stub_path is not None AND
+        The file at stub_path exist
+                THEN
+        we will open the stub file in binary read mode
+        Loads the tracking data from the file using pickle
+        And returns the loaded tracking data and exits the function
+        """
+        if read_from_stub and stub_path is not None and os.path.exists(stub_path):
+            with open(stub_path, 'rb') as f:
+                tracks = pickle.load(f)
+            return tracks
+
         detections = self.detect_frames(frames)
 
         # putting the tracked object in a format so we can utilise easily
@@ -124,6 +140,8 @@ class Tracker:
                 if cls_id == cls_names_inv['ball']:
                     tracks["ball"][frame_num][1] = {"bbox": bbox}
 
-            print(detection_supervision)
-
-            break
+        # If a stub_path was provided, save the tracking data to this file using pickle
+        if stub_path is not None:
+            with open(stub_path, 'wb') as f:
+                pickle.dump(tracks, f)
+        return tracks
