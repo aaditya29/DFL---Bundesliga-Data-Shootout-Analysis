@@ -1,4 +1,4 @@
-from utils import get_center_of_bbox, get_bbox_width, get_foot_position
+from utils import get_center_of_bbox, get_bbox_width
 from ultralytics import YOLO
 import supervision as sv
 import pickle
