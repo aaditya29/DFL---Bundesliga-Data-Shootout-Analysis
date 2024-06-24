@@ -46,6 +46,14 @@ class Tracker:
             # Converting to supervision detection format
             detection_supervision = sv.Detections.from_ultralytics(detection)
 
+            # Converting goalkeeper to player object
+            """
+            This loop iterates over the class IDs in the detection. If a class is identified as "goalkeeper", it changes its class ID to that of "player".
+            """
+            for object_ind, class_id in enumerate(detection_supervision.class_id):
+                if cls_names[class_id] == "goalkeeper":
+                    detection_supervision.class_id[object_ind] = cls_names_inv["player"]
+
             print(detection_supervision)
 
             break
