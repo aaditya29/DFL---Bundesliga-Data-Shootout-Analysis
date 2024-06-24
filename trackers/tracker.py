@@ -145,3 +145,44 @@ class Tracker:
             with open(stub_path, 'wb') as f:
                 pickle.dump(tracks, f)
         return tracks
+
+
+# Adding Circles Near Bounding Boxes
+"""
+self: refers to the instance of the class this method belongs to.
+
+video_frames: A list of video frames to be annotated.
+
+tracks: A dictionary containing tracking information for players, the ball, and referees. This dictionary is structured with keys "players", "ball", and "referees", each containing lists of dictionaries for each frame.
+
+team_ball_control: Data that indicates which team has control of the ball for each frame.
+"""
+
+
+def draw_annotations(self, video_frames, tracks, team_ball_control):
+    # initialising an empty list to store the annotated video frames
+    output_video_frames = []  # video frames after drawing the output on
+
+    # Here we starting a loop that iterates through each frame in video_frames. enumerate() is used to get both the index (frame_num) and the frame itself.
+    for frame_num, frame in enumerate(video_frames):
+        # creating a copy of the current frame to avoid modifying the original frame.
+        frame = frame.copy()
+
+        # Retrieving dictionaries containing tracking information for players, the ball, and referees for the current frame.
+        player_dict = tracks["players"][frame_num]
+        ball_dict = tracks["ball"][frame_num]
+        referee_dict = tracks["referees"][frame_num]
+
+        # Drawing Players
+        """
+        Here we looping through each player in the dict.
+        
+        First we retrieve the player's team color, defaulting to red.
+        
+        Calling 'self.draw_ellipse' to draw an ellipse around the player's bounding box (player["bbox"]) in the specified color. 
+        
+        If the player has the ball (player.get('has_ball', False)), calls self.draw_traingle to draw a triangle on the player's bounding box.
+        """
+        for track_id, player in player_dict.items():
+            color = player.get("team_color", (0, 0, 255))
+            frame = self.draw_ellipse(frame, player["bbox"], color, track_id)
