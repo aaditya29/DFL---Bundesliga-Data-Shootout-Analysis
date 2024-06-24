@@ -150,91 +150,87 @@ class Tracker:
                 pickle.dump(tracks, f)
         return tracks
 
-
-"""
-Following method defines a method called draw_ellipse that takes several parameters:
-
-self: Indicates method in a class
-frame: video frame
-bbox: bounding box, ontaining coordinates
-color: color to draw the ellipse
-track_id: An optional parameter, defaulting to None
-"""
-
-
-def draw_ellipses(self, frame, bbox, color, track_id=None):
-
-    # y2 is set to the integer value of the fourth element in bbox
-    y2 = int(bbox[3])
-    x_center, _ = get_center_of_bbox(bbox)
-    width = get_bbox_width(bbox)
-
     """
-    Here we calling OpenCV's ellipse function to draw an ellipse on the frame.
+    Following method defines a method called draw_ellipse that takes several parameters:
+
+    self: Indicates method in a class
+    frame: video frame
+    bbox: bounding box, ontaining coordinates
+    color: color to draw the ellipse
+    track_id: An optional parameter, defaulting to None
+    """
+
+    def draw_ellipses(self, frame, bbox, color, track_id=None):
+
+        # y2 is set to the integer value of the fourth element in bbox
+        y2 = int(bbox[3])
+        x_center, _ = get_center_of_bbox(bbox)
+        width = get_bbox_width(bbox)
+
+        """
+        Here we calling OpenCV's ellipse function to draw an ellipse on the frame.
     
-    The center is at (x_center, y2)
-    The axes are (width, 0.35*width), making it wider than it is tall
-    The ellipse is not rotated (angle=0.0)
-    It's drawn from -45 degrees to 235 degrees, creating a partial ellipse
-    It uses the provided color
-    The line thickness is 2 pixels
-    The line type is cv2.LINE_4 i.e. (4-connected line)
+        The center is at (x_center, y2)
+        The axes are (width, 0.35*width), making it wider than it is tall
+        The ellipse is not rotated (angle=0.0)
+        It's drawn from -45 degrees to 235 degrees, creating a partial ellipse
+        It uses the provided color
+        The line thickness is 2 pixels
+        The line type is cv2.LINE_4 i.e. (4-connected line)
+        """
+        cv2.ellipse(
+            frame,
+            center=(x_center, y2),
+            axes=(int(width), int(0.35*width)),
+            angle=0.0,
+            startAngle=-45,
+            endAngle=235,
+            color=color,
+            thickness=2,
+            lineType=cv2.LINE_4
+        )
+
+        return frame
+
+    # Adding Circles Near Bounding Boxes
     """
-    cv2.ellipse(
-        frame,
-        center=(x_center, y2),
-        axes=(int(width), int(0.35*width)),
-        angle=0.0,
-        startAngle=-45,
-        endAngle=235,
-        color=color,
-        thickness=2,
-        lineType=cv2.LINE_4
-    )
+    self: refers to the instance of the class this method belongs to.
 
-    return frame
+    video_frames: A list of video frames to be annotated.
 
+    tracks: A dictionary containing tracking information for players, the ball, and referees. This dictionary is structured with keys "players", "ball", and "referees", each containing lists of dictionaries for each frame.
 
-# Adding Circles Near Bounding Boxes
-"""
-self: refers to the instance of the class this method belongs to.
+    team_ball_control: Data that indicates which team has control of the ball for each frame.
+    """
 
-video_frames: A list of video frames to be annotated.
+    def draw_annotations(self, video_frames, tracks):
+        # initialising an empty list to store the annotated video frames
+        output_video_frames = []  # video frames after drawing the output on
 
-tracks: A dictionary containing tracking information for players, the ball, and referees. This dictionary is structured with keys "players", "ball", and "referees", each containing lists of dictionaries for each frame.
+        # Here we starting a loop that iterates through each frame in video_frames. enumerate() is used to get both the index (frame_num) and the frame itself.
+        for frame_num, frame in enumerate(video_frames):
+            # creating a copy of the current frame to avoid modifying the original frame.
+            frame = frame.copy()
 
-team_ball_control: Data that indicates which team has control of the ball for each frame.
-"""
+            # Retrieving dictionaries containing tracking information for players, the ball, and referees for the current frame.
+            player_dict = tracks["players"][frame_num]
+            ball_dict = tracks["ball"][frame_num]
+            referee_dict = tracks["referees"][frame_num]
 
-
-def draw_annotations(self, video_frames, tracks, team_ball_control):
-    # initialising an empty list to store the annotated video frames
-    output_video_frames = []  # video frames after drawing the output on
-
-    # Here we starting a loop that iterates through each frame in video_frames. enumerate() is used to get both the index (frame_num) and the frame itself.
-    for frame_num, frame in enumerate(video_frames):
-        # creating a copy of the current frame to avoid modifying the original frame.
-        frame = frame.copy()
-
-        # Retrieving dictionaries containing tracking information for players, the ball, and referees for the current frame.
-        player_dict = tracks["players"][frame_num]
-        ball_dict = tracks["ball"][frame_num]
-        referee_dict = tracks["referees"][frame_num]
-
-        # Drawing Players
-        """
-        Here we looping through each player in the dict.
+            # Drawing Players
+            """
+            Here we looping through each player in the dict.
         
-        First we retrieve the player's team color, defaulting to red.
+            First we retrieve the player's team color, defaulting to red.
         
-        Calling 'self.draw_ellipse' to draw an ellipse around the player's bounding box (player["bbox"]) in the specified color. 
+            Calling 'self.draw_ellipse' to draw an ellipse around the player's bounding box (player["bbox"]) in the specified color. 
         
-        If the player has the ball (player.get('has_ball', False)), calls self.draw_traingle to draw a triangle on the player's bounding box.
-        """
-        for track_id, player in player_dict.items():
-            frame = self.draw_ellipse(
-                frame, player["bbox"], (0, 0, 255), track_id)
+            If the player has the ball (player.get('has_ball', False)), calls self.draw_traingle to draw a triangle on the player's bounding box.
+            """
+            for track_id, player in player_dict.items():
+                frame = self.draw_ellipse(
+                    frame, player["bbox"], (0, 0, 255), track_id)
 
-        output_video_frames.append(frame)
+            output_video_frames.append(frame)
 
-    return output_video_frames
+        return output_video_frames
