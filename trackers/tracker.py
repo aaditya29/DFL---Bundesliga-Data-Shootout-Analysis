@@ -160,7 +160,7 @@ class Tracker:
     track_id: An optional parameter, defaulting to None
     """
 
-    def draw_ellipses(self, frame, bbox, color, track_id=None):
+    def draw_ellipse(self, frame, bbox, color, track_id=None):
 
         # y2 is set to the integer value of the fourth element in bbox
         y2 = int(bbox[3])
