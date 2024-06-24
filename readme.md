@@ -39,7 +39,7 @@ The project is based on a tutorial video on YouTube which demonstrates how to ut
 
 ```bash
 git clone https://github.com/aaditya29/DFL---Bundesliga-Data-Shootout-Analysis.git
-cd DFL-Bundesliga-Data-Shootout-Analysis
+cd DFL---Bundesliga-Data-Shootout-Analysis
 ```
 
 ## Usage
