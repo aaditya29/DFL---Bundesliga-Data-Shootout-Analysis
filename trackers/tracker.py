@@ -1,6 +1,8 @@
 from utils import get_center_of_bbox, get_bbox_width
 from ultralytics import YOLO
 import supervision as sv
+import numpy as np
+import pandas as pd
 import pickle
 import os
 import sys
@@ -247,6 +249,47 @@ class Tracker:
             )
         return frame
 
+    """
+    Here we define a method named draw_triangle that takes parameters:
+    self: Indicates this is a method in a class
+    frame: The image to draw on
+    bbox: Bounding box coordinates
+    color: Color for filling the triangle
+    """
+
+    def draw_triangle(self, frame, bbox, color):
+        # y is set to the integer value of the second element of bbox
+        y = int(bbox[1])
+        # x is obtained by calling get_center_of_bbox(bbox), which returns the center x-coordinate of the bounding box
+        x, _ = get_center_of_bbox(bbox)
+
+        """
+        Here we are defining the trangle points.
+        This creates a NumPy array defining three points of a triangle:
+        The bottom point at (x, y)
+        The top-left point at (x-10, y-20)
+        The top-right point at (x+10, y-20) whichforms an upward-pointing triangle.
+        """
+        triangle_points = np.array([
+            [x, y],
+            [x-10, y-20],
+            [x+10, y-20],
+        ])
+
+        """
+        Here we use  OpenCV's drawContours function to draw and fill the triangle:
+        frame: The image to draw on
+        [triangle_points]: A list containing the triangle points
+        0: Index of the contour to draw (0 since there's only one)
+        color: The color to fill the triangle with
+        cv2.FILLED: Indicates to fill the triangle
+        """
+        cv2.drawContours(frame, [triangle_points], 0, color, cv2.FILLED)
+
+        # Drawing triangle outline
+        cv2.drawContours(frame, [triangle_points], 0, (0, 0, 0), 2)
+
+        return frame
     # Adding Circles Near Bounding Boxes
     """
     self: refers to the instance of the class this method belongs to.
@@ -290,6 +333,10 @@ class Tracker:
             for _, referee in referee_dict.items():
                 frame = self.draw_ellipse(
                     frame, referee["bbox"], (0, 255, 255))
+
+            # Draw ball
+            for track_id, ball in ball_dict.items():
+                frame = self.draw_traingle(frame, ball["bbox"], (0, 255, 0))
 
             output_video_frames.append(frame)
 
