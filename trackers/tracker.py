@@ -191,9 +191,60 @@ class Tracker:
         )
 
         # Drawing rectangle
+        # Defining the dimensions of rectangle to be drawn
         rectangle_width = 40
         rectangle_height = 20
+        """
+        x1_rect = x_center - rectangle_width // 2 calculates the x-coordinate of the left edge of the rectangle. It starts from the center (x_center) and subtracts half the width of the rectangle. Here // operator performs integer division, ensuring the result is a whole number.
+        
+        
+        x2_rect = x_center + rectangle_width // 2 calculates the x-coordinate of the right edge of the rectangle. It starts from the center and adds half the width of the rectangle.
+        
+        y1_rect = (y2 - rectangle_height // 2) + 15 calculates the y-coordinate of the top edge of the rectangle. It starts from y2 (which is the bottom of the bounding box),subtracts half the height of the rectangle to center it vertically, then adds 15 pixels to move it slightly downward.
+        
+        y2_rect = (y2 + rectangle_height // 2) + 15 calculates the y-coordinate of the bottom edge of the rectangle.It starts from y2, adds half the height of the rectangle, and also adds 15 pixels to match the downward shift of the top edge.
+        """
+        x1_rect = x_center - rectangle_width//2
+        x2_rect = x_center + rectangle_width//2
+        y1_rect = (y2 - rectangle_height//2) + 15
+        y2_rect = (y2 + rectangle_height//2) + 15
 
+        if track_id is not None:  # checking if track_id was provided then
+
+            """
+            Here we draw a filled rectangle on the frame.
+
+            Co-ordinates are top-left and bottom-right corners of the rectangle and cv2.FILLED fills the rectangle with the specified color.
+            """
+            cv2.rectangle(frame,
+                          (int(x1_rect), int(y1_rect)),
+                          (int(x2_rect), int(y2_rect)),
+                          color,
+                          cv2.FILLED)
+            """
+            This calculates the x-coordinate for text placement. It is adjusted slightly if track_id is greater than 99 to ensure proper alignment.
+            """
+            x1_text = x1_rect + 12
+            if track_id > 99:
+                x1_text -= 10
+
+            """
+            Here we add the track ID as text on the frame:
+            Text is the string representation of track_id
+            Positioned based on the calculated coordinates
+            Uses specified font, scale 0.6
+            Black color (0,0,0)
+            Thickness of 2
+            """
+            cv2.putText(
+                frame,
+                f"{track_id}",
+                (int(x1_text), int(y1_rect+15)),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                0.6,
+                (0, 0, 0),
+                2
+            )
         return frame
 
     # Adding Circles Near Bounding Boxes
