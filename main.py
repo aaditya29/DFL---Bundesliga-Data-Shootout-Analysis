@@ -18,7 +18,7 @@ def main():
                                        stub_path='stubs/track_stubs.pkl')
 
     # Saving cropped image of the player for analysis
-    for track_id, player in tracks['players'].items():
+    for track_id, player in tracks['players'][0].items():
         bbox = player['bbox']
         frame = video_frames[0]
 
