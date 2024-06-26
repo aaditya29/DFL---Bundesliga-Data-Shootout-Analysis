@@ -326,8 +326,9 @@ class Tracker:
             If the player has the ball (player.get('has_ball', False)), calls self.draw_traingle to draw a triangle on the player's bounding box.
             """
             for track_id, player in player_dict.items():
+                color = player.get("team_color", (0, 0, 255))
                 frame = self.draw_ellipse(
-                    frame, player["bbox"], (0, 0, 255), track_id)
+                    frame, player["bbox"], color, track_id)
 
             # Drawing Referee
             for _, referee in referee_dict.items():
