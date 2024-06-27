@@ -19,7 +19,18 @@ class Tracker:
     # method to detect the frames from the videos with self as reference and frames as list or array of image frames
 
     def interpolate_ball_positions(self, ball_positions):
+        # Converting ball position format to pandas dataframe format
+        # We are getting track id 1 and if no track id then
+        # it's going to be empty dictonary
+        # and then we get bbox and if not bbox then empty list and then
+        # the empty list will be interpolated by pandas dataframe
         ball_positions = [x.get(1, {}).get('bbox', []) for x in ball_positions]
+        # converting to pandas dataframes
+        df_ball_positions = pd.DataFrame(
+            ball_positions, columns=['x1', 'y1', 'x2', 'y2'])
+
+        # Interpolate Missing Values
+        df_ball_positions = df_ball_positions.interpolate()
 
     def detect_frames(self, frames):
 
