@@ -17,6 +17,10 @@ class Tracker:
         self.tracker = sv.ByteTrack()
 
     # method to detect the frames from the videos with self as reference and frames as list or array of image frames
+
+    def interpolate_ball_positions(self, ball_positions):
+        ball_positions = [x.get(1, {}).get('bbox', []) for x in ball_positions]
+
     def detect_frames(self, frames):
 
         batch_size = 20  # stating batch_size as 20. In image processing, working with batches of data can be more efficient than processing each item individually
