@@ -18,6 +18,8 @@ def main():
                                        read_from_stub=True,
                                        stub_path='stubs/track_stubs.pkl')
 
+    # Interpolating/inserting ball positions
+    tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
     # Assigning player teams
     team_assigner = TeamAssigner()  # initialising team assigner
     # assigning team their colours and by giving them first frame and tracks of player in first frame
