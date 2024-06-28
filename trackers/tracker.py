@@ -25,12 +25,21 @@ class Tracker:
         # and then we get bbox and if not bbox then empty list and then
         # the empty list will be interpolated by pandas dataframe
         ball_positions = [x.get(1, {}).get('bbox', []) for x in ball_positions]
-        # converting to pandas dataframes
+        # converting to pandas dataframes with columns 'x1', 'y1', 'x2', and 'y2'.
         df_ball_positions = pd.DataFrame(
             ball_positions, columns=['x1', 'y1', 'x2', 'y2'])
 
-        # Interpolate Missing Values
+        # Interpolate/inserting Missing Values
         df_ball_positions = df_ball_positions.interpolate()
+        # Edge case if the missing detection is first one we not going to interpolate it
+        # bfill()performs a backward fill on the DataFrame, filling any remaining NaN values with the next valid value.
+        df_ball_positions = df_ball_positions.bfill()
+
+        # Converting the processed DataFrame back into the original nested dictionary structure.
+        ball_positions = [{1: {"bbox": x}}
+                          for x in df_ball_positions.to_numpy().tolist()]
+
+        return ball_positions
 
     def detect_frames(self, frames):
 
