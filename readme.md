@@ -31,7 +31,7 @@ The project is based on a tutorial video on YouTube which demonstrates how to ut
 - Pandas
 - Ultralytics
 - Supervision
-- YOLOv3 weights and configuration files
+- YOLOv3 and YOLOv5 weights and configuration files
 
 ## Installation
 
