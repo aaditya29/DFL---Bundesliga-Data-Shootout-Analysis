@@ -356,7 +356,7 @@ class Tracker:
 
                 # if player doesn't have ball then we can draw just a triangle with colour red
                 if player.get('has_ball', False):
-                    frame = self.draw_traingle(
+                    frame = self.draw_triangle(
                         frame, player["bbox"], (0, 0, 255))
 
             # Drawing Referee
