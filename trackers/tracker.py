@@ -354,6 +354,11 @@ class Tracker:
                 frame = self.draw_ellipse(
                     frame, player["bbox"], color, track_id)
 
+                # if player doesn't have ball then we can draw just a triangle with colour red
+                if player.get('has_ball', False):
+                    frame = self.draw_traingle(
+                        frame, player["bbox"], (0, 0, 255))
+
             # Drawing Referee
             for _, referee in referee_dict.items():
                 frame = self.draw_ellipse(
