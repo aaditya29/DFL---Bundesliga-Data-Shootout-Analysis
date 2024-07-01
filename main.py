@@ -35,6 +35,17 @@ def main():
             tracks['players'][frame_num][player_id]['team'] = team
             tracks['players'][frame_num][player_id]['team_color'] = team_assigner.team_colors[team]
 
+    # Assigning ball to player function
+    player_assigner = PlayerBallAssigner()
+    for frame_num, player_track in enumerate(tracks['players']):
+        ball_bbox = tracks['ball'][frame_num][1]['bbox']
+        assigned_player = player_assigner.assign_ball_to_player(
+            player_track, ball_bbox)
+
+        # if player is assigned
+        if assigned_player != -1:
+            tracks['players'][frame_num][assigned_player]['has_ball'] = True
+
     # Calling draw output function for object tracks
     output_video_frames = tracker.draw_annotations(video_frames, tracks)
 
