@@ -316,15 +316,53 @@ class Tracker:
         return frame
 
     def draw_team_ball_control(self, frame, frame_num, team_ball_control):
+        """
+        In this method we are taking four parameters:
+        self: The instance of the class this method belongs to
+        frame: The current video frame to draw on
+        frame_num: The current frame number
+        team_ball_control: An array containing ball control data
+
+
+        """
         # Drawing a semi-transparent rectangle
+        # Creating a copy of the current frame, which will be used to create a semi-transparent overlay
         overlay = frame.copy()
+        """
+        Here we draw a white rectangle on the overlay image. The rectangle's top-left corner is at (1350, 850) and bottom-right corner is at (1900, 970). The -1 thickness means the rectangle is filled.
+        
+        And then we blend the overlay with the original frame to create a semi-transparent effect.
+        cv2.addWeighted() function is used to blend two images.
+        overlay:is the first input array (image). In this case, it's the copy of the frame with the white rectangle drawn on it.
+        alpha: is the weight of the first array elements. It's set to 0.4 in our code, which means the overlay will be 40% opaque.
+        frame: is the second input array (image). Here, it's the original frame.
+        1 - alpha: is the weight of the second array elements. Since alpha is 0.4, this will be 0.6, meaning the original frame will be 60% visible.
+        0: is a scalar added to each sum. In this case, it's 0, so nothing extra is added.
+        frame: is the output array. The result is stored back in the original frame.
+        """
         cv2.rectangle(overlay, (1350, 850), (1900, 970), (255, 255, 255), -1)
         alpha = 0.4  # for transparency
         cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
 
+        # slicing the team_ball_control array from the beginning up to and including the current frame.
         team_ball_control_till_frame = team_ball_control[:frame_num+1]
         # Get the number of time each team had ball control
+        """
+        Here we count, how many frames each team had control of the ball. It does this by counting how many times 1 (for team 1) and 2 (for team 2) appear in the sliced array.
+        
+        Then we calculate the percentage of ball control for each team by dividing each team's frame count by the total number of frames. These lines add text to the frame showing the ball control percentages for each team. The text is black, uses the HERSHEY_SIMPLEX font, has a scale of 1, and a thickness of 3.
+        """
         team_1_num_frames = team_ball_control_till_frame[team_ball_control_till_frame == 1].shape[0]
+        team_2_num_frames = team_ball_control_till_frame[team_ball_control_till_frame == 2].shape[0]
+        team_1 = team_1_num_frames/(team_1_num_frames+team_2_num_frames)
+        team_2 = team_2_num_frames/(team_1_num_frames+team_2_num_frames)
+
+        cv2.putText(frame, f"Team 1 Ball Control: {team_1*100:.2f}%",
+                    (1400, 900), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 3)
+        cv2.putText(frame, f"Team 2 Ball Control: {team_2*100:.2f}%",
+                    (1400, 950), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 3)
+
+        return frame
 
     # Drawing Near Bounding Boxes
     """
