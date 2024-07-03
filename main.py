@@ -43,12 +43,18 @@ def main():
         assigned_player = player_assigner.assign_ball_to_player(
             player_track, ball_bbox)
 
-        # if player is assigned
         if assigned_player != -1:
             tracks['players'][frame_num][assigned_player]['has_ball'] = True
+            # we getting tracks of players of frame numbers and then assign teamp player with team
+            team_ball_control.append(
+                tracks['players'][frame_num][assigned_player]['team'])
+        else:
+            # last person who has the ball
+            team_ball_control.append(team_ball_control[-1])
 
     # Calling draw output function for object tracks
-    output_video_frames = tracker.draw_annotations(video_frames, tracks)
+    output_video_frames = tracker.draw_annotations(
+        video_frames, tracks, team_ball_control)
 
     # Saving video
     save_video(output_video_frames, 'output_videos/output_video.avi')
