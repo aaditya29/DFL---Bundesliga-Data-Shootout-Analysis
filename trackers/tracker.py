@@ -316,7 +316,15 @@ class Tracker:
         return frame
 
     def draw_team_ball_control(self, frame, frame_num, team_ball_control):
-        pass
+        # Drawing a semi-transparent rectangle
+        overlay = frame.copy()
+        cv2.rectangle(overlay, (1350, 850), (1900, 970), (255, 255, 255), -1)
+        alpha = 0.4  # for transparency
+        cv2.addWeighted(overlay, alpha, frame, 1 - alpha, 0, frame)
+
+        team_ball_control_till_frame = team_ball_control[:frame_num+1]
+        # Get the number of time each team had ball control
+        team_1_num_frames = team_ball_control_till_frame[team_ball_control_till_frame == 1].shape[0]
 
     # Drawing Near Bounding Boxes
     """
