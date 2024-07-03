@@ -314,7 +314,11 @@ class Tracker:
         cv2.drawContours(frame, [triangle_points], 0, (0, 0, 0), 2)
 
         return frame
-    # Adding Circles Near Bounding Boxes
+
+    def draw_team_ball_control(self, frame, frame_num, team_ball_control):
+        pass
+
+    # Drawing Near Bounding Boxes
     """
     self: refers to the instance of the class this method belongs to.
 
@@ -325,7 +329,7 @@ class Tracker:
     team_ball_control: Data that indicates which team has control of the ball for each frame.
     """
 
-    def draw_annotations(self, video_frames, tracks):
+    def draw_annotations(self, video_frames, tracks, team_ball_control):
         # initialising an empty list to store the annotated video frames
         output_video_frames = []  # video frames after drawing the output on
 
@@ -367,6 +371,10 @@ class Tracker:
             # Draw ball
             for track_id, ball in ball_dict.items():
                 frame = self.draw_triangle(frame, ball["bbox"], (0, 255, 0))
+
+            # Drawing team ball control box
+            frame = self.draw_team_ball_control(
+                frame, frame_num, team_ball_control)
 
             output_video_frames.append(frame)
 
