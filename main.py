@@ -3,6 +3,7 @@ from trackers import Tracker
 from team_assigner import TeamAssigner
 from player_ball_assigner import PlayerBallAssigner
 import cv2
+import numpy as np
 
 
 def main():
@@ -51,7 +52,7 @@ def main():
         else:
             # last person who has the ball
             team_ball_control.append(team_ball_control[-1])
-
+    team_ball_control = np.array(team_ball_control)
     # Calling draw output function for object tracks
     output_video_frames = tracker.draw_annotations(
         video_frames, tracks, team_ball_control)
