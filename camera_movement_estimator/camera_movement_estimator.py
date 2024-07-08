@@ -11,7 +11,7 @@ class CameraMovementEstimator:
     def __init__(self, frame):
         self.minimum_distance = 5
         """
-        Here we define a dictionary self.lk_params that contains parameters for the Lucas-Kanade optical flow method. 
+        Here we define a dictionary self.lk_params that contains parameters for the Lucas-Kanade optical flow method.
         The Lucas-Kanade method is used to estimate the motion of objects between two consecutive frames.
 
         `winSize` specifies the size of the search window at each pyramid level. In this case, a window size of 15x15 pixels is used. This window is used to match features between frames.
@@ -42,7 +42,7 @@ class CameraMovementEstimator:
 
         """
         Here we are defining a dictionary self.features with parameters for the cv2.goodFeaturesToTrack function:
-        
+
         `maxCorners: is used for maximum number of corners to return. If there are more corners than that, the strongest ones are returned.
         qualityLevel: Parameter characterizing the minimal accepted quality of image corners. A value of 0.3 means the algorithm will keep corners with a quality score of at least 30% of the best corner's score.
         minDistance: Minimum possible Euclidean distance between the returned corners.
@@ -60,6 +60,10 @@ class CameraMovementEstimator:
     def get_camera_movement(self, frames, read_from_stub=False, stub_path=None):
 
         # Reading the stub from the file
+        if read_from_stub and stub_path is not None and os.path.exists(stub_path):
+            with open(stub_path, 'rb') as f:
+                return pickle.load(f)
+
         # movement for x and movement for y coordinates and multiplying by frames
         camera_movement = [[0, 0]]*len(frames)
 
@@ -81,10 +85,10 @@ class CameraMovementEstimator:
 
             """
             Here we are iterating over the pairs of new and old features.
-            
-            new and old are points representing feature coordinates. 
+
+            new and old are points representing feature coordinates.
             .ravel() is a method in NumPy that flattens an array. It returns a contiguous flattened array, meaning it converts a multi-dimensional array into a one-dimensional array.
-            
+
             new and old is likely a 2D array with the shape (1, 2) (or similar), containing the x and y coordinates of a feature point.
             new.ravel() flattens this 2D array into a 1D array with the shape (2,), which means new_features_point will be a 1D array containing the x and y coordinates
             """
@@ -106,7 +110,7 @@ class CameraMovementEstimator:
             Here we check the max_distance (the maximum distance between new and old features calculated in the loop) is greater than a threshold value, self.minimum_distance.
             If the condition is true we update the camera_movement list at the index frame_num (the current frame number).
             camera_movement_x and camera_movement_y are the x and y components of the movement vector, calculated as the largest movement of features between the two frames.
-            
+
             After recording the camera movement, this line detects new features in the current frame (now stored in frame_gray).
             cv2.goodFeaturesToTrack is an OpenCV function used to detect good features (corners) to track in an image.
             The **self.features syntax unpacks the dictionary self.features into keyword arguments for the cv2.goodFeaturesToTrack function. This dictionary contains parameters like maxCorners, qualityLevel, minDistance, blockSize, and mask.
@@ -119,5 +123,9 @@ class CameraMovementEstimator:
 
             # Updating old_gray to be the current frame's grayscale image.
             old_gray = frame_gray.copy()
+
+        if stub_path is not None:
+            with open(stub_path, 'wb') as f:
+                pickle.dump(camera_movement, f)
 
         return camera_movement
