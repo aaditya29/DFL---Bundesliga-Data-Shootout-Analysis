@@ -1,12 +1,28 @@
+from utils import measure_distance, measure_xy_distance
 import cv2
 import pickle
 import numpy as np
-import matplotlib as plt
+import os
+import sys
+sys.path.append('../')
 
 
 class CameraMovementEstimator:
     def __init__(self, frame):
+        """
+        Here we define a dictionary self.lk_params that contains parameters for the Lucas-Kanade optical flow method. 
+        The Lucas-Kanade method is used to estimate the motion of objects between two consecutive frames.
 
+        `winSize` specifies the size of the search window at each pyramid level. In this case, a window size of 15x15 pixels is used. This window is used to match features between frames.
+        `maxLevel` specifies the maximum number of pyramid levels, including the initial image. A value of 2 means the algorithm will use three levels in total: the original image (level 0), and two reduced resolution images (levels 1 and 2).
+
+        criteria specifies the termination criteria of the iterative search algorithm of the optical flow. It is a tuple where:
+        cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT is a combination of two criteria types:
+        cv2.TERM_CRITERIA_EPS: The algorithm stops if the specified accuracy (epsilon) is reached.
+        cv2.TERM_CRITERIA_COUNT: The algorithm stops after a specified number of iterations.
+        10 is the maximum number of iterations the algorithm will run.
+        0.03 is the desired accuracy (epsilon). If the change in the search window position is less than this value, the algorithm will stop.
+        """
         self.lk_params = dict(
             winSize=(15, 15),
             maxLevel=2,
@@ -57,3 +73,21 @@ class CameraMovementEstimator:
             frame_gray = cv2.cvtColor(frames[frame_num], cv2.COLOR_BGR2GRAY)
             new_features, _, _ = cv2.calcOpticalFlowPyrLK(
                 old_gray, frame_gray, old_features, None, **self.lk_params)
+
+            # Measuring distance between new and old features
+            max_distance = 0
+            camera_movement_x, camera_movement_y = 0, 0
+
+            for i, (new, old) in enumerate(new_features, old_features):
+                new_features_point = new.ravel()
+                old_features_point = old.ravel()
+
+                distance = measure_distance(
+                    new_features_point, old_features_point)
+
+                if distance > max_distance:
+                    max_distance = distance
+                    camera_movement_x = new_features_point[0] - \
+                        old_features_point[0]
+                    camera_movement_y = new_features_point[1] - \
+                        old_features_point[1]
