@@ -57,6 +57,29 @@ class CameraMovementEstimator:
             mask=mask_features
         )
 
+    # This method adjusts the positions of tracked objects based on the movement of the camera.
+    # We take three parameters
+    # self: Refers to the instance of the class.
+    # tracks: A dictionary containing tracking information for multiple objects. Each object has its own set of tracks across frames.
+    # camera_movement_per_frame: A list where each element represents the camera movement(x and y coordinates) for each frame.
+
+    def add_adjust_positions_to_tracks(self, tracks, camera_movement_per_frame):
+        # Iterating over the tracks dictionary. object is the key representing a specific object, and object_tracks is the value, which is a list of tracks for that object.
+        for object, object_tracks in tracks.items():
+            # Iterating  over the list of object_tracks. frame_num is the index of the current frame, and track is the tracking information for that frame.
+            for frame_num, track in enumerate(object_tracks):
+                # Iterating over the track dictionary. track_id is the key representing a specific track ID, and track_info is the value, which contains information about that track
+                for track_id, track_info in track.items():
+                    # RetrievING the original position of the tracked object from track_info.
+                    position = track_info['position']
+                    # Retreiving the camera movement for the current frame from camera_movement_per_frame.
+                    camera_movement = camera_movement_per_frame[frame_num]
+                    # Adjusting  the position of the tracked object by subtracting the camera movement from the original position. This compensates for the movement of the camera, resulting in the adjusted position.
+                    position_adjusted = (
+                        position[0]-camera_movement[0], position[1]-camera_movement[1])
+                    # Updating the tracks dictionary with the adjusted position for the specific track_id within the current frame of the object.
+                    tracks[object][frame_num][track_id]['position_adjusted'] = position_adjusted
+
     def get_camera_movement(self, frames, read_from_stub=False, stub_path=None):
 
         # Reading the stub from the file
