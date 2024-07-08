@@ -9,6 +9,7 @@ sys.path.append('../')
 
 class CameraMovementEstimator:
     def __init__(self, frame):
+        self.minimum_distance = 5
         """
         Here we define a dictionary self.lk_params that contains parameters for the Lucas-Kanade optical flow method. 
         The Lucas-Kanade method is used to estimate the motion of objects between two consecutive frames.
@@ -78,16 +79,45 @@ class CameraMovementEstimator:
             max_distance = 0
             camera_movement_x, camera_movement_y = 0, 0
 
+            """
+            Here we are iterating over the pairs of new and old features.
+            
+            new and old are points representing feature coordinates. 
+            .ravel() is a method in NumPy that flattens an array. It returns a contiguous flattened array, meaning it converts a multi-dimensional array into a one-dimensional array.
+            
+            new and old is likely a 2D array with the shape (1, 2) (or similar), containing the x and y coordinates of a feature point.
+            new.ravel() flattens this 2D array into a 1D array with the shape (2,), which means new_features_point will be a 1D array containing the x and y coordinates
+            """
             for i, (new, old) in enumerate(new_features, old_features):
                 new_features_point = new.ravel()
                 old_features_point = old.ravel()
 
+                # calculating the distance between the new and old features using a custom function measure_distance.
                 distance = measure_distance(
                     new_features_point, old_features_point)
 
+                # If the current distance is greater than max_distance, update max_distance and calculate the x and y movement using a custom function measure_xy_distance.
                 if distance > max_distance:
                     max_distance = distance
-                    camera_movement_x = new_features_point[0] - \
-                        old_features_point[0]
-                    camera_movement_y = new_features_point[1] - \
-                        old_features_point[1]
+                    camera_movement_x, camera_movement_y = measure_xy_distance(
+                        old_features_point, new_features_point)
+
+            """
+            Here we check the max_distance (the maximum distance between new and old features calculated in the loop) is greater than a threshold value, self.minimum_distance.
+            If the condition is true we update the camera_movement list at the index frame_num (the current frame number).
+            camera_movement_x and camera_movement_y are the x and y components of the movement vector, calculated as the largest movement of features between the two frames.
+            
+            After recording the camera movement, this line detects new features in the current frame (now stored in frame_gray).
+            cv2.goodFeaturesToTrack is an OpenCV function used to detect good features (corners) to track in an image.
+            The **self.features syntax unpacks the dictionary self.features into keyword arguments for the cv2.goodFeaturesToTrack function. This dictionary contains parameters like maxCorners, qualityLevel, minDistance, blockSize, and mask.
+            """
+            if max_distance > self.minimum_distance:
+                camera_movement[frame_num] = [
+                    camera_movement_x, camera_movement_y]
+                old_features = cv2.goodFeaturesToTrack(
+                    frame_gray, **self.features)
+
+            # Updating old_gray to be the current frame's grayscale image.
+            old_gray = frame_gray.copy()
+
+        return camera_movement
