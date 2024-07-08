@@ -7,6 +7,13 @@ import matplotlib as plt
 class CameraMovementEstimator:
     def __init__(self, frame):
 
+        self.lk_params = dict(
+            winSize=(15, 15),
+            maxLevel=2,
+            criteria=(cv2.TERM_CRITERIA_EPS |
+                      cv2.TERM_CRITERIA_COUNT, 10, 0.03)
+        )
+
         # Here we converting the input frame from RGB color space to grayscale using OpenCV's cvtColor function. cv2.COLOR_BGR2GRAY specifies the conversion type.
         first_frame_grayscale = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         # Creating an array of zeros with the same shape as first_frame_grayscale. This will serve as a mask to specify regions of interest for feature detection.
@@ -45,3 +52,8 @@ class CameraMovementEstimator:
         # Detecting  good features to track in old_gray using the parameters defined in self.features.
         #  The **self.features syntax unpacks the dictionary into keyword arguments.
         old_features = cv2.goodFeaturesToTrack(old_gray, **self.features)
+
+        for frame_num in range(1, len(frames)):
+            frame_gray = cv2.cvtColor(frames[frame_num], cv2.COLOR_BGR2GRAY)
+            new_features, _, _ = cv2.calcOpticalFlowPyrLK(
+                old_gray, frame_gray, old_features, None, **self.lk_params)
