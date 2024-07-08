@@ -1,4 +1,4 @@
-from utils import get_center_of_bbox, get_bbox_width
+from utils import get_center_of_bbox, get_bbox_width, get_foot_position
 from ultralytics import YOLO
 import supervision as sv
 import numpy as np
@@ -16,8 +16,18 @@ class Tracker:
         # each detected object is assigned a unique tracker ID, enabling the continuous following of the object's motion path across different frames
         self.tracker = sv.ByteTrack()
 
-    # method to detect the frames from the videos with self as reference and frames as list or array of image frames
+    def add_position_to_tracks(self, tracks):
+        for object, object_tracks in tracks.items():
+            for frame_num, track in enumerate(object_tracks):
+                for track_id, track_info in track.items():
+                    bbox = track_info['bbox']
+                    if object == 'ball':
+                        position = get_center_of_bbox(bbox)
+                    else:
+                        position = get_foot_position(bbox)
+                    tracks[object][frame_num][track_id]['position'] = position
 
+    # method to detect the frames from the videos with self as reference and frames as list or array of image frames
     def interpolate_ball_positions(self, ball_positions):
         # Converting ball position format to pandas dataframe format
         # We are getting track id 1 and if no track id then
