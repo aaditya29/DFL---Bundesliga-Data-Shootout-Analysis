@@ -62,7 +62,6 @@ class CameraMovementEstimator:
     # self: Refers to the instance of the class.
     # tracks: A dictionary containing tracking information for multiple objects. Each object has its own set of tracks across frames.
     # camera_movement_per_frame: A list where each element represents the camera movement(x and y coordinates) for each frame.
-
     def add_adjust_positions_to_tracks(self, tracks, camera_movement_per_frame):
         # Iterating over the tracks dictionary. object is the key representing a specific object, and object_tracks is the value, which is a list of tracks for that object.
         for object, object_tracks in tracks.items():
