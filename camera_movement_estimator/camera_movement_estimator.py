@@ -92,7 +92,7 @@ class CameraMovementEstimator:
             new and old is likely a 2D array with the shape (1, 2) (or similar), containing the x and y coordinates of a feature point.
             new.ravel() flattens this 2D array into a 1D array with the shape (2,), which means new_features_point will be a 1D array containing the x and y coordinates
             """
-            for i, (new, old) in enumerate(new_features, old_features):
+            for i, (new, old) in enumerate(zip(new_features, old_features)):
                 new_features_point = new.ravel()
                 old_features_point = old.ravel()
 
