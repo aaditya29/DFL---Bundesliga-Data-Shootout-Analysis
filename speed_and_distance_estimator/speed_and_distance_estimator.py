@@ -11,6 +11,7 @@ class SpeedAndDistance_Estimator():
         self.frame_rate = 24  # frame rate 24 frame per second
 
     def add_speed_and_distance_to_tracks(self, tracks):
+        total_distance = {}
 
         for object, object_tracks in tracks.items():
             if object == "ball" or object == "referees":
