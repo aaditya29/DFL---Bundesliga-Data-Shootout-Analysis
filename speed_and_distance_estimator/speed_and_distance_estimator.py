@@ -51,3 +51,21 @@ class SpeedAndDistance_Estimator():
                             continue
                         tracks[object][frame_num_batch][track_id]['speed'] = speed_km_per_hour
                         tracks[object][frame_num_batch][track_id]['distance'] = total_distance[object][track_id]
+
+    def draw_speed_and_distance(self, frames, tracks):
+        output_frames = []
+        for frame_num, frame in enumerate(frames):
+            for object, object_tracks in tracks.items():
+                if object == "ball" or object == "referees":
+                    continue
+                for _, track_info in object_tracks[frame_num].items():
+                    if "speed" in track_info:
+                        speed = track_info.get('speed', None)
+                        distance = track_info.get('distance', None)
+                        if speed is None or distance is None:
+                            continue
+
+                        bbox = track_info['bbox']
+                        position = get_foot_position(bbox)
+                        position = list(position)
+                        position[1] += 40  # buffer of 40 pixels
