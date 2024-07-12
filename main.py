@@ -4,6 +4,7 @@ from team_assigner import TeamAssigner
 from player_ball_assigner import PlayerBallAssigner
 from camera_movement_estimator import CameraMovementEstimator
 from view_transformer import ViewTransformer
+from speed_and_distance_estimator import SpeedAndDistance_Estimator
 import cv2
 import numpy as np
 
@@ -41,6 +42,11 @@ def main():
 
     # Interpolating/inserting ball positions
     tracks["ball"] = tracker.interpolate_ball_positions(tracks["ball"])
+
+    # Speed and distance estimator
+    speed_and_distance_estimator = SpeedAndDistance_Estimator()
+    speed_and_distance_estimator.add_speed_and_distance_to_tracks(tracks)
+
     # Assigning player teams
     team_assigner = TeamAssigner()  # initialising team assigner
     # assigning team their colours and by giving them first frame and tracks of player in first frame
