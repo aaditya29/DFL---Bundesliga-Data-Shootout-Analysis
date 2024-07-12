@@ -10,7 +10,6 @@ This project takes works on the You Only Look Once (YOLO) object detection algor
 - [Installation](#installation)
 - [Usage](#usage)
 - [References](#references)
-- [License](#license)
 
 ## Introduction
 
