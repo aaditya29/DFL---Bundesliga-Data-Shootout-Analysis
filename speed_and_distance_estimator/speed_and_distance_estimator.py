@@ -37,3 +37,17 @@ class SpeedAndDistance_Estimator():
                     time_elapsed = (last_frame-frame_num)/self.frame_rate
                     speed_meteres_per_second = distance_covered/time_elapsed
                     speed_km_per_hour = speed_meteres_per_second*3.6
+
+                    if object not in total_distance:
+                        total_distance[object] = {}
+
+                    if track_id not in total_distance[object]:
+                        total_distance[object][track_id] = 0
+
+                    total_distance[object][track_id] += distance_covered
+
+                    for frame_num_batch in range(frame_num, last_frame):
+                        if track_id not in tracks[object][frame_num_batch]:
+                            continue
+                        tracks[object][frame_num_batch][track_id]['speed'] = speed_km_per_hour
+                        tracks[object][frame_num_batch][track_id]['distance'] = total_distance[object][track_id]
